@@ -12,4 +12,4 @@ editor.on('load', async () => {
   document.querySelector<HTMLElement>('.loader')!.remove();
 });
 
-editor.mount(document.body);
+editor.mount(document.querySelector('#app')!);

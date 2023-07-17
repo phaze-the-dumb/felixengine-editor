@@ -1,3 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300&display=swap');
+
+* {
+  box-sizing: border-box;
+  color: white;
+  font-family: 'Rubik', sans-serif;
+}
+
 .loader{
   background: black;
   position: fixed;
@@ -63,4 +71,58 @@
   100%{
     transform: translate(-50%, -50%) rotate(370deg);
   }
+}
+
+.navbar{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 20px;
+  display: flex;
+  background: #BBB;
+}
+
+.navbutton{
+  color: black;
+  padding: 0 10px;
+  cursor: pointer;
+  user-select: none;
+  transition: 0.1s;
+}
+
+.navbutton:hover{
+  background: #0005;
+}
+
+.context-menu{
+  padding: 5px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: #757575;
+}
+
+.editor-window{
+  border: 2px solid #888;
+}
+
+.editor-window::before{
+  content: "";
+  display: block;
+  height: 20px;
+  background: #777;
+  cursor: pointer;
+  user-select: none;
+}
+
+.window-darktheme{
+  background: #222;
+}
+
+.window-header{
+  margin-top: -20px;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
 }
