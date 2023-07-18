@@ -1,4 +1,8 @@
 import { ContextMenu } from "./ContextMenu";
+import { FelixScene } from "../../felix/main";
+import { WindowController } from "./WindowController";
+
+import { HierachyWindowController } from "./WindowControllers/HierachyWindowController";
 
 enum WindowType{
   HIERARCHY, INSPECTOR, UNKNOWN,
@@ -54,15 +58,28 @@ class EditorWindow{
   header: HTMLElement;
   contextMenu: Array<{ name: string, cb: Function }>;
   menu: ContextMenu;
+  scene: FelixScene;
+  controller: WindowController;
 
-  constructor( aContainer: HTMLElement, aType: WindowType, aTheme: WindowTheme, menu: ContextMenu ){
+  constructor( aContainer: HTMLElement, aType: WindowType, aTheme: WindowTheme, menu: ContextMenu, scene: FelixScene ){
     this.container = aContainer;
     this.type = aType;
     this.theme = aTheme;
     this.div = document.createElement('div');
     this.transform = new EditorWindowTransform(this);
-    this.contextMenu = [ { name: 'hi', cb: () => { console.log('hi') } } ];
+    this.contextMenu = [];
     this.menu = menu;
+    this.scene = scene;
+
+    switch(this.type){
+      case WindowType.HIERARCHY:
+        this.controller = new HierachyWindowController();
+        break;
+
+      default:
+        this.controller = new WindowController();
+        break;
+    }
 
     this.header = document.createElement('div');
     this.header.innerHTML = 'Unknown';
@@ -118,28 +135,17 @@ class EditorWindow{
     this.transform.update();
   }
 
+  setScene( scene: FelixScene ): void {
+    this.scene = scene;
+    this.update();
+  }
+
   render(): void {
-    switch(this.type){
-      case WindowType.HIERARCHY:
-        this.setHeader('Hierarchy');
+    this.controller.render(this);
+  }
 
-        break;
-      case WindowType.INSPECTOR:
-        this.setHeader('Inspector');
-
-        break;
-      case WindowType.GAME:
-        this.setHeader('Game');
-
-        break;
-      case WindowType.SCENE:
-        this.setHeader('Scene');
-
-        break;
-      case WindowType.UNKNOWN:
-
-        break;
-    }
+  update(){
+    this.controller.update(this);
   }
 }
 

@@ -101,10 +101,11 @@
   left: 0;
   background: #999;
   border-radius: 5px;
+  box-shadow: #0008 0 0 10px;
 }
 
 .context-menu-button{
-  padding: 5px;
+  padding: 5px 10px;
   background: transparent;
   transition: 0.1s;
   cursor: pointer;
@@ -139,4 +140,32 @@
   text-align: center;
   cursor: pointer;
   user-select: none;
+}
+
+.hierarchy-container{
+  padding: 0px;
+}
+
+.hierarchy-object{
+  padding: 2.5px;
+  cursor: pointer;
+  user-select: none;
+  transition: 0.1s;
+  margin: 2px;
+  margin-left: 5px;
+}
+
+.hierarchy-object:hover{
+  background: rgba(138, 138, 138, 0.333);
+}
+
+.hierarchy-selected{
+  background: #00ccff55 !important;
+}
+
+.go-name-input{
+  background: none;
+  border: none;
+  font-size: 15px;
+  border-bottom: white 2px solid;
 }

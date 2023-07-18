@@ -76,7 +76,15 @@ class ContextMenu{
     button.classList.add("context-menu-button");
     button.innerHTML = text;
 
-    button.onclick = () => { cb(); };
+    button.onclick = () => {
+      cb();
+
+      this.div.style.display = "none";
+      this.closeOnMouseLeave = false;
+      this.lockPosition = false;
+
+      this.reset();
+    };
     this.div.appendChild(button);
     this.buttons.push(button);
   }
@@ -93,7 +101,6 @@ class ContextMenu{
       this.div.style.left = (mouseX - this.menuSize.width) + "px";
     else
       this.div.style.left = mouseX + "px";
-
   }
 
   updateMouse( mouseX: number, mouseY: number ): void {
