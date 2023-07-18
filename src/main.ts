@@ -8,7 +8,7 @@ editor.on('load', async () => {
   console.log('Loaded editor.');
 
   document.querySelector<HTMLElement>('.loader')!.style.opacity = '0';
-  await sleep(1000);
+  await sleep(250);
   document.querySelector<HTMLElement>('.loader')!.remove();
 });
 

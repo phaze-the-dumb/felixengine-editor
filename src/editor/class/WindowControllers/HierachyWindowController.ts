@@ -11,6 +11,7 @@ class HierarchyObject{
   children: Array<HierarchyObject> = [];
   id: string;
   obj: GameObject;
+  childrenCount: number = 0;
   mouseOver: boolean = false;
 
   constructor(obj: GameObject){
@@ -29,7 +30,7 @@ class HierarchyObject{
     childContainer.addEventListener('mouseover', () => this.mouseOver = true);
     childContainer.addEventListener('mouseleave', () => this.mouseOver = false);
 
-    let name = document.createElement("span");
+    let name = document.createElement("div");
     name.innerHTML = this.name;
 
     childContainer.appendChild(name);
@@ -48,7 +49,7 @@ class HierarchyObject{
       selectedElement.onmouseleave = () => mouseOverSelected = false;
     }
 
-    childContainer.addEventListener('click', () => {
+    name.addEventListener('click', () => {
       if(selectedElement){
         selectedElement.classList.remove("hierarchy-selected");
 
@@ -66,7 +67,7 @@ class HierarchyObject{
       selectedElement.onmouseleave = () => mouseOverSelected = false;
     })
 
-    childContainer.addEventListener('dblclick', () => {
+    name.addEventListener('dblclick', () => {
       let nameInput = document.createElement("input");
       nameInput.classList.add('go-name-input');
       nameInput.value = this.name;
@@ -97,18 +98,20 @@ class HierarchyObject{
 
       if(!obj)
         this.children.push(new HierarchyObject(child));
-      else if(obj.children.length !== child.children.length)
+      else if(obj.childrenCount !== child.childrenCount)
         obj.update(child);
       else if(obj.name !== child.name)
         obj.name = child.name;
     });
 
     this.children.forEach(child => {
-      let obj = child.children.find(x => x.id === child.id);
+      let obj = go.children.find(x => x.id === child.id);
 
       if(!obj)
-        this.children.filter(x => x.id !== child.id);
+        this.children = this.children.filter(x => x.id !== child.id);
     })
+
+    this.childrenCount = go.childrenCount;
   }
 }
 
@@ -137,6 +140,15 @@ class HierachyWindowController extends WindowController {
         selectedChild.obj.createEmptyChild('Empty GameObject');
       } else
         win.scene.createEmptyChild('Empty GameObject');
+  
+      win.update();
+    } });
+
+    win.contextMenu.push({ name: 'Add Camera', cb: () => {
+      if(selectedElement && selectedChild){
+        selectedChild.obj.createEmptyChild('Camera');
+      } else
+        win.scene.createEmptyChild('Camera');
       
       win.update();
     } });
@@ -196,10 +208,10 @@ class HierachyWindowController extends WindowController {
 
     win.scene.children.forEach(child => {
       let obj = this.objectList.find(x => x.id === child.id);
-
+      
       if(!obj)
         this.objectList.push(new HierarchyObject(child))
-      else if(obj.children.length !== child.children.length)
+      else if(obj.childrenCount !== child.childrenCount)
         obj.update(child);
       else if(obj.name !== child.name)
         obj.name = child.name;
