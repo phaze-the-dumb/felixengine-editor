@@ -96,11 +96,25 @@
 }
 
 .context-menu{
-  padding: 5px;
   position: fixed;
   top: 0;
   left: 0;
-  background: #757575;
+  background: #999;
+  border-radius: 5px;
+}
+
+.context-menu-button{
+  padding: 5px;
+  background: transparent;
+  transition: 0.1s;
+  cursor: pointer;
+  user-select: none;
+  border-radius: 5px;
+  min-width: 100px;
+}
+
+.context-menu-button:hover{
+  background: #0005;
 }
 
 .editor-window{

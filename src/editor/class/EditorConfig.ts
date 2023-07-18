@@ -81,7 +81,7 @@ class EditorConfig{
 
   load(): void {
     this.windows.forEach(w => {
-      let win = new EditorWindow(this.editor.container!, w.type, w.theme);
+      let win = new EditorWindow(this.editor.container!, w.type, w.theme, this.editor.ctxMenu);
 
       win.setPosition(w.x, w.y);
       win.setSize(w.width, w.height);

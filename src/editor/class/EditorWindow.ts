@@ -1,3 +1,5 @@
+import { ContextMenu } from "./ContextMenu";
+
 enum WindowType{
   HIERARCHY, INSPECTOR, UNKNOWN,
   GAME, SCENE
@@ -50,13 +52,17 @@ class EditorWindow{
   setupWin: Function | undefined;
   transform: EditorWindowTransform;
   header: HTMLElement;
+  contextMenu: Array<{ name: string, cb: Function }>;
+  menu: ContextMenu;
 
-  constructor( aContainer: HTMLElement, aType: WindowType, aTheme: WindowTheme ){
+  constructor( aContainer: HTMLElement, aType: WindowType, aTheme: WindowTheme, menu: ContextMenu ){
     this.container = aContainer;
     this.type = aType;
     this.theme = aTheme;
     this.div = document.createElement('div');
     this.transform = new EditorWindowTransform(this);
+    this.contextMenu = [ { name: 'hi', cb: () => { console.log('hi') } } ];
+    this.menu = menu;
 
     this.header = document.createElement('div');
     this.header.innerHTML = 'Unknown';
@@ -77,6 +83,23 @@ class EditorWindow{
       this.setupWin();
     else
       this.render();
+
+    this.div.addEventListener('contextmenu', ( e: Event ) => {
+      e.preventDefault();
+
+      if(this.contextMenu.length > 0){
+        this.contextMenu.forEach(( a: { name: string, cb: Function } ) =>
+          menu.addButton(a.name, a.cb));
+
+        menu.setActive(true);
+      }
+    });
+
+    this.div.onmousedown = () => {
+      if(this.menu.lockPosition){
+        this.menu.setActive(false);
+      }
+    }
   }
 
   setHeader( header: string ): void {

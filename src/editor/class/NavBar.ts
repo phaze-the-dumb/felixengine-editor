@@ -1,16 +1,23 @@
+import { ContextMenu } from "./ContextMenu";
+
 class NavBar{
   div: HTMLElement;
   tabs: any;
+  menu: ContextMenu;
 
-  constructor(){
+  constructor( ctxMenu: ContextMenu ){
     this.div = document.createElement("div");
     this.div.classList.add("navbar");
+    this.menu = ctxMenu;
 
     this.tabs = {
-      File: [],
-      Edit: [],
-      View: [],
+      File: [ 'Save' ],
+      Edit: [ 'Project Settings' ]
     };
+  }
+
+  buttonPress(tab: string, btn: string): void {
+    console.log(tab, btn);
   }
 
   load( container: HTMLElement ){
@@ -18,6 +25,24 @@ class NavBar{
       let div = document.createElement("div");
       div.innerText = tab;
       div.classList.add('navbutton');
+
+      div.onclick = () => {
+        this.menu.reset();
+
+        this.tabs[tab].forEach((btn: any) => {
+          this.menu.addButton(btn, () => {
+            this.buttonPress(tab, btn);
+          });
+        })
+
+        this.menu.setActive(true);
+      }
+
+      div.onmouseleave = () => {
+        setTimeout(() => {
+          this.menu.setActive(false);
+        }, 100);
+      }
 
       this.div.appendChild(div);
     });
