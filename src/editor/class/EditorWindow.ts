@@ -2,7 +2,11 @@ import { ContextMenu } from "./ContextMenu";
 import { FelixScene } from "../../felix/main";
 import { WindowController } from "./WindowController";
 
+import { Editor } from "../main";
+
 import { HierachyWindowController } from "./WindowControllers/HierachyWindowController";
+import { GameWindowController } from "./WindowControllers/GameWindowController";
+import { InspectorWindowController } from "./WindowControllers/InspectorWindowController";
 
 enum WindowType{
   HIERARCHY, INSPECTOR, UNKNOWN,
@@ -60,22 +64,29 @@ class EditorWindow{
   menu: ContextMenu;
   scene: FelixScene;
   controller: WindowController;
+  editor: Editor;
 
-  constructor( aContainer: HTMLElement, aType: WindowType, aTheme: WindowTheme, menu: ContextMenu, scene: FelixScene ){
-    this.container = aContainer;
-    this.type = aType;
-    this.theme = aTheme;
+  constructor( editor: Editor, type: WindowType, theme: WindowTheme ){
+    this.container = editor.container!;
+    this.type = type;
+    this.theme = theme;
     this.div = document.createElement('div');
     this.transform = new EditorWindowTransform(this);
     this.contextMenu = [];
-    this.menu = menu;
-    this.scene = scene;
+    this.menu = editor.ctxMenu;
+    this.scene = editor.currentScene!;
+    this.editor = editor;
 
     switch(this.type){
       case WindowType.HIERARCHY:
         this.controller = new HierachyWindowController();
         break;
-
+      case WindowType.GAME:
+        this.controller = new GameWindowController();
+        break;
+      case WindowType.INSPECTOR:
+        this.controller = new InspectorWindowController();
+        break;
       default:
         this.controller = new WindowController();
         break;
@@ -98,17 +109,21 @@ class EditorWindow{
 
     if(this.type == WindowType.UNKNOWN && this.setupWin)
       this.setupWin();
-    else
-      this.render();
+    else{
+      setTimeout(() => {
+        this.render();
+        this.controller.init = true;
+      }, 10);
+    }
 
     this.div.addEventListener('contextmenu', ( e: Event ) => {
       e.preventDefault();
 
       if(this.contextMenu.length > 0){
         this.contextMenu.forEach(( a: { name: string, cb: Function } ) =>
-          menu.addButton(a.name, a.cb));
+          this.menu.addButton(a.name, a.cb));
 
-        menu.setActive(true);
+        this.menu.setActive(true);
       }
     });
 
@@ -144,8 +159,12 @@ class EditorWindow{
     this.controller.render(this);
   }
 
-  update(){
+  update(): void {
     this.controller.update(this);
+  }
+
+  ref(): void {
+    this.controller.ref();
   }
 }
 

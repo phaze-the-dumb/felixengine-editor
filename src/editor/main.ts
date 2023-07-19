@@ -63,6 +63,10 @@ class Editor extends EventEmitter {
 
   update(): void {
     this.ctxMenu.updateMouse(mouse.x, mouse.y);
+    this.windows.forEach(win => {
+      if(win.controller.init)
+        win.ref()
+    });
 
     requestAnimationFrame(() => this.update());
   }

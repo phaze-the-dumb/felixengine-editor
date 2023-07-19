@@ -1,10 +1,13 @@
-import { EditorWindow } from "../EditorWindow";
+import { EditorWindow, WindowType } from "../EditorWindow";
 import { WindowController } from "../WindowController";
 import { GameObject } from "../../../felix/class/GameObject";
+import { InspectorWindowController } from "./InspectorWindowController";
+import { FelixCamera } from "../../../felix/class/GameObject/FelixCamera";
 
 let selectedElement: HTMLElement | null = null;
 let selectedChild: HierarchyObject | null = null;
 let mouseOverSelected: boolean = false;
+let inspector: InspectorWindowController | null = null;
 
 class HierarchyObject{
   name: string;
@@ -44,6 +47,8 @@ class HierarchyObject{
       childContainer.classList.add("hierarchy-selected");
       selectedElement = childContainer;
       selectedChild = this;
+
+      inspector?.displayObject(this.obj);
       
       selectedElement.onmouseover = () => mouseOverSelected = true;
       selectedElement.onmouseleave = () => mouseOverSelected = false;
@@ -62,6 +67,8 @@ class HierarchyObject{
       mouseOverSelected = true;
       selectedElement = childContainer;
       selectedChild = this;
+
+      inspector?.displayObject(this.obj);
 
       selectedElement.onmouseover = () => mouseOverSelected = true;
       selectedElement.onmouseleave = () => mouseOverSelected = false;
@@ -124,6 +131,10 @@ class HierachyWindowController extends WindowController {
     win.div.appendChild(this.container);
 
     this.container.classList.add('hierarchy-container');
+    let iwindow = win.editor.windows.find(x => x.type === WindowType.INSPECTOR)?.controller;
+
+    if(iwindow && iwindow instanceof InspectorWindowController)
+      inspector = iwindow;
 
     win.contextMenu.push({ name: 'Paste', cb: () => {
       console.log('Paste Clipboard');
@@ -136,20 +147,23 @@ class HierachyWindowController extends WindowController {
     win.contextMenu.push({ name: '--- Add Object ---', cb: () => {} });
 
     win.contextMenu.push({ name: 'Empty', cb: () => {
-      if(selectedElement && selectedChild){
+      if(selectedElement && selectedChild)
         selectedChild.obj.createEmptyChild('Empty GameObject');
-      } else
+      else
         win.scene.createEmptyChild('Empty GameObject');
   
       win.update();
     } });
 
     win.contextMenu.push({ name: 'Add Camera', cb: () => {
-      if(selectedElement && selectedChild){
-        selectedChild.obj.createEmptyChild('Camera');
-      } else
-        win.scene.createEmptyChild('Camera');
+      let go: GameObject; 
+
+      if(selectedElement && selectedChild)
+        go = selectedChild.obj.createEmptyChild('Camera');
+      else
+        go = win.scene.createEmptyChild('Camera');
       
+      go.addComponent(FelixCamera);
       win.update();
     } });
 
@@ -178,6 +192,8 @@ class HierachyWindowController extends WindowController {
 
         selectedChild = null;
         selectedElement = null;
+          
+        inspector?.displayObject(null);
       }
     });
 
@@ -191,9 +207,13 @@ class HierachyWindowController extends WindowController {
 
           selectedChild = null;
           selectedElement = null;
+          
+          inspector?.displayObject(null);
         }
       }, 50)
     });
+
+    setTimeout(() => { inspector?.displayObject(null) });
   }
 
   renderObjectList(): void {
@@ -208,7 +228,7 @@ class HierachyWindowController extends WindowController {
 
     win.scene.children.forEach(child => {
       let obj = this.objectList.find(x => x.id === child.id);
-      
+
       if(!obj)
         this.objectList.push(new HierarchyObject(child))
       else if(obj.childrenCount !== child.childrenCount)
