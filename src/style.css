@@ -188,7 +188,7 @@ body{
 
 .inspector-component{
   width: 100%;
-  background: #cfcfcf;
+  background: #979797;
   color: black;
   margin: 10px 0;
 }
@@ -198,5 +198,6 @@ body{
   color: white;
   text-align: left;
   padding-left: 10px;
-  margin-bottom: 5px;
+  cursor: pointer;
+  user-select: none;
 }
