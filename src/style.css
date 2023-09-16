@@ -201,3 +201,21 @@ body{
   cursor: pointer;
   user-select: none;
 }
+
+.small-inspector-input{
+  width: 75px;
+  background: rgb(77, 77, 77);
+  color: white;
+  border: gray 1px solid;
+  outline: none;
+}
+
+.inspector-values{
+  display: inline-block;
+  text-align: right;
+  width: 100%;
+}
+
+.inspector-component-value{
+  display: flex;
+}

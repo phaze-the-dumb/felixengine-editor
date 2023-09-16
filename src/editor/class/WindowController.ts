@@ -1,10 +1,11 @@
 import { EditorWindow } from "./EditorWindow";
+import { Editor } from '../main';
 
 class WindowController{
   init: boolean = false;
 
-  render( window: EditorWindow ): void {};
-  update( window: EditorWindow ): void {};
+  render( _window: EditorWindow, _editor: Editor ): void {};
+  update( _window: EditorWindow, _editor: Editor ): void {};
   ref(): void {};
 }
 

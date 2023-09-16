@@ -156,11 +156,15 @@ class EditorWindow{
   }
 
   render(): void {
-    this.controller.render(this);
+    this.controller.render(this, this.editor);
   }
 
   update(): void {
-    this.controller.update(this);
+    this.controller.update(this, this.editor);
+  }
+
+  getController<Type extends WindowController>(): Type {
+    return this.controller as any;
   }
 
   ref(): void {

@@ -3,6 +3,8 @@ import { WindowController } from "../WindowController";
 import { GameObject } from "../../../felix/class/GameObject";
 import { InspectorWindowController } from "./InspectorWindowController";
 import { FelixCamera } from "../../../felix/class/GameObject/FelixCamera";
+import { Editor } from "../../main";
+import { GameWindowController } from "./GameWindowController";
 
 let selectedElement: HTMLElement | null = null;
 let selectedChild: HierarchyObject | null = null;
@@ -125,10 +127,19 @@ class HierarchyObject{
 class HierachyWindowController extends WindowController {
   objectList: Array<HierarchyObject> = [];
   container: HTMLElement = document.createElement("div");
+  mouseOver: boolean = false;
 
-  render(win: EditorWindow): void {
+  render(win: EditorWindow, editor: Editor): void {
     win.setHeader('Hierarchy');
     win.div.appendChild(this.container);
+
+    win.div.addEventListener('mouseover', () => {
+      this.mouseOver = true;
+    })
+
+    win.div.addEventListener('mouseleave', () => {
+      this.mouseOver = false;
+    })
 
     this.container.classList.add('hierarchy-container');
     let iwindow = win.editor.windows.find(x => x.type === WindowType.INSPECTOR)?.controller;
@@ -163,7 +174,16 @@ class HierachyWindowController extends WindowController {
       else
         go = win.scene.createEmptyChild('Camera');
       
-      go.addComponent(FelixCamera);
+      let cam = go.addComponent<FelixCamera>(FelixCamera);
+
+      let gameWin = editor.windows.find(x => x.type === WindowType.GAME);
+      if(gameWin){
+        let controller = gameWin.getController<GameWindowController>();
+
+        if(!controller.renderScreen.camera)
+          controller.renderScreen.camera = cam;
+      }
+
       win.update();
     } });
 
@@ -186,7 +206,19 @@ class HierachyWindowController extends WindowController {
     } });
 
     document.addEventListener('keydown', ( e: KeyboardEvent ) => {
-      if(e.key === 'Delete' && selectedChild){
+      if(e.key === 'Delete' && selectedChild && this.mouseOver){
+        if(selectedChild.obj.components.find(x => x.name === 'Camera')){
+          let cam = selectedChild.obj.getComponent<FelixCamera>(FelixCamera);
+
+          let gameWin = editor.windows.find(x => x.type === WindowType.GAME);
+          if(gameWin){
+            let controller = gameWin.getController<GameWindowController>();
+
+            if(controller.renderScreen.camera === cam)
+              controller.renderScreen.camera = null;
+          }
+        }
+
         selectedChild.obj.remove();
         win.update();
 
