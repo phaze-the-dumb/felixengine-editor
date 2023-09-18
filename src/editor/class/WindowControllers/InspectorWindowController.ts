@@ -5,7 +5,9 @@ import { GameObject } from "../../../felix/class/GameObject";
 import { Component } from "../../../felix/class/GameObject/Component";
 
 let colours: any = {
-  'Camera': '#c5ffc3'
+  'Camera': '#c5ffc3',
+  'Bounding Box': '#6cd8fc',
+  'Sprite': '#ee6cfc'
 };
 
 let hasShift = false;
@@ -142,6 +144,34 @@ class InspectorComponent{
 
         container.appendChild(xInput);
         div.appendChild(container);
+      } else if(type === 'Number'){
+        let xInput = document.createElement("input");
+
+        let x = (component as any)[key];
+
+        xInput.className = "small-inspector-input";
+        xInput.value = x.toFixed(6);
+
+        xInput.onwheel = ( e: WheelEvent ) => {
+          if(e.deltaY < 0)
+            x = x + (hasShift ? 0.1 : 1);
+          else
+            x = x - (hasShift ? 0.1 : 1);
+
+          xInput.value = x.toFixed(6);
+          (component as any)[key] = x;
+        }
+
+        xInput.onchange = () => {
+          x = parseFloat(xInput.value);
+          (component as any)[key] = x;
+        }
+
+        let container = document.createElement("div");
+        container.className = 'inspector-values';
+
+        container.appendChild(xInput);
+        div.appendChild(container);
       } else if(type === 'Colour'){
         let input = document.createElement("input");
         input.type = 'color';
@@ -185,7 +215,6 @@ class InspectorWindowController extends WindowController {
       return;
     }
 
-    console.log(go);
     this.content.innerHTML = '<span class="inspector-title">'+go.name+'</span>';
 
     go.components.forEach(component => {

@@ -5,6 +5,7 @@ import { InspectorWindowController } from "./InspectorWindowController";
 import { FelixCamera } from "../../../felix/class/GameObject/FelixCamera";
 import { Editor } from "../../main";
 import { GameWindowController } from "./GameWindowController";
+import { Sprite } from "../../../felix/class/GameObject/Sprite";
 
 let selectedElement: HTMLElement | null = null;
 let selectedChild: HierarchyObject | null = null;
@@ -87,15 +88,24 @@ class HierarchyObject{
       nameInput.addEventListener('change', () => {
         this.name = nameInput.value;
         name.innerHTML = this.name;
+
+        this.obj.name = nameInput.value;
+        inspector?.displayObject(this.obj);
       });
 
       nameInput.addEventListener('keydown', ( e: KeyboardEvent ) => {
         if(e.key === 'Enter'){
           this.name = nameInput.value;
           name.innerHTML = this.name;
+
+          this.obj.name = nameInput.value;
+          inspector?.displayObject(this.obj);
         } else if(e.key === 'Escape'){
           this.name = nameInput.value;
           name.innerHTML = this.name;
+
+          this.obj.name = nameInput.value;
+          inspector?.displayObject(this.obj);
         }
       });
     });
@@ -162,12 +172,12 @@ class HierachyWindowController extends WindowController {
         selectedChild.obj.createEmptyChild('Empty GameObject');
       else
         win.scene.createEmptyChild('Empty GameObject');
-  
+
       win.update();
     } });
 
     win.contextMenu.push({ name: 'Add Camera', cb: () => {
-      let go: GameObject; 
+      let go: GameObject;
 
       if(selectedElement && selectedChild)
         go = selectedChild.obj.createEmptyChild('Camera');
@@ -188,11 +198,14 @@ class HierachyWindowController extends WindowController {
     } });
 
     win.contextMenu.push({ name: 'Sprite', cb: () => {
+      let go: GameObject;
+
       if(selectedElement && selectedChild){
-        selectedChild.obj.createEmptyChild('New Sprite');
+        go = selectedChild.obj.createEmptyChild('New Sprite');
       } else
-        win.scene.createEmptyChild('New Sprite');
-      
+        go = win.scene.createEmptyChild('New Sprite');
+
+      go.addComponent<Sprite>(Sprite);
       win.update();
     } });
     
