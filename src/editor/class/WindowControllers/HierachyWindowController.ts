@@ -19,14 +19,18 @@ class HierarchyObject{
   obj: GameObject;
   childrenCount: number = 0;
   mouseOver: boolean = false;
+  mouseDown: boolean = false;
+  controller: HierachyWindowController;
+  depth: number = 0;
 
-  constructor(obj: GameObject){
+  constructor(obj: GameObject, controller: HierachyWindowController){
     this.name = obj.name;
     this.id = obj.id;
     this.obj = obj;
+    this.controller = controller;
 
     obj.children.forEach(child =>
-      this.children.push(new HierarchyObject(child)));
+      this.children.push(new HierarchyObject(child, controller)));
   }
 
   render( container: HTMLElement ): void {
@@ -77,6 +81,22 @@ class HierarchyObject{
       selectedElement.onmouseleave = () => mouseOverSelected = false;
     })
 
+    name.addEventListener('mousedown', () => {
+      this.mouseDown = true;
+    })
+
+    window.addEventListener('mouseup', () => {
+      this.mouseDown = false;
+
+      let object: HierarchyObject | null = null;
+
+      for(let item of this.controller.objectList){
+        if(item.mouseOver){
+          object = item;
+        }
+      }
+    })
+
     name.addEventListener('dblclick', () => {
       let nameInput = document.createElement("input");
       nameInput.classList.add('go-name-input');
@@ -116,7 +136,7 @@ class HierarchyObject{
       let obj = this.children.find(x => x.id === child.id);
 
       if(!obj)
-        this.children.push(new HierarchyObject(child));
+        this.children.push(new HierarchyObject(child, this.controller));
       else if(obj.childrenCount !== child.childrenCount)
         obj.update(child);
       else if(obj.name !== child.name)
@@ -183,7 +203,7 @@ class HierachyWindowController extends WindowController {
         go = selectedChild.obj.createEmptyChild('Camera');
       else
         go = win.scene.createEmptyChild('Camera');
-      
+
       let cam = go.addComponent<FelixCamera>(FelixCamera);
 
       let gameWin = editor.windows.find(x => x.type === WindowType.GAME);
@@ -275,7 +295,7 @@ class HierachyWindowController extends WindowController {
       let obj = this.objectList.find(x => x.id === child.id);
 
       if(!obj)
-        this.objectList.push(new HierarchyObject(child))
+        this.objectList.push(new HierarchyObject(child, this))
       else if(obj.childrenCount !== child.childrenCount)
         obj.update(child);
       else if(obj.name !== child.name)
